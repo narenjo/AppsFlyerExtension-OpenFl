@@ -7,7 +7,7 @@ import neko.Lib;
 #end
 
 #if (android && openfl)
-import openfl.utils.JNI;
+import lime.system.JNI;
 #end
 
 
@@ -41,31 +41,28 @@ class AppsFlyerExtension {
 	}
 	
 	public static function startTracking (devKey:String, appId:String = ""):Void {
-
-		trace("AppsFlyerReferrerDetectStep startTracking");
-		#if (ios)
-
-			appsflyerextension_startTracking(devKey, appId);
-
+		#if (android)
+		var fn = JNI.createStaticMethod(
+			"org.haxe.extension.AppsFlyerExtension",
+			"init",
+			"(Ljava/lang/String;)V"
+		);
+		JNI.callStatic(fn, [devKey]);
 		#end
-		
+
+		#if (ios)
+			appsflyerextension_startTracking(devKey, appId);
+		#end
 	}
 
 	public static function trackEvent (eventName:String, eventData:String):Void {
-
-		trace("AppsFlyerReferrerDetectStep trackEvent");
-
 		#if (android)
-
 			appsflyerextension_trackEvent_jni(eventName, eventData);
-
 		#end
+
 		#if (ios)
-
 			appsflyerextension_trackEvent(eventName, eventData);
-
 		#end
-
 	}
 
 	public static function addConversionListenerCallback(onSuccess:String -> Void, onError:String -> Void):Void {

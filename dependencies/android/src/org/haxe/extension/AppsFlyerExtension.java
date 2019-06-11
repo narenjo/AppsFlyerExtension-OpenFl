@@ -12,6 +12,7 @@ import android.util.Log;
 import com.google.common.base.Joiner;
 import com.appsflyer.AppsFlyerLib;
 import com.appsflyer.AppsFlyerConversionListener;
+import com.appsflyer.AppsFlyerTrackingRequestListener;
 import android.app.Application;
 import java.util.*;
 import java.lang.Runnable;
@@ -61,6 +62,8 @@ public class AppsFlyerExtension extends Extension {
     public static int sessionCount = 0;
     public static HaxeObject callbackObj = null;
 
+    private static String LOG_TAG = "AppsFlyerExtension";
+
     public AppsFlyerExtension()
     {
         if (instance != null)
@@ -86,24 +89,31 @@ public class AppsFlyerExtension extends Extension {
             errorCallback(AppsFlyerExtension.conversionError);
     }
 
-    private void startTracking (String devKey) {
+    public static void init (String devKey) {
+//        Log.w(LOG_TAG, "init devKey: " + devKey);
+        getInstance().startTracking(devKey);
+    }
+
+    public void startTracking (String devKey) {
         AppsFlyerExtension.devKey = devKey;
 
-        Log.v(AppsFlyerLib.LOG_TAG, "startTracking with id: " + devKey);
+//        Log.w(LOG_TAG, "startTracking with id: " + devKey);
 
         final AppsFlyerConversionListener convListener = new AppsFlyerConversionListener() {
             /* Returns the attribution data. Note - the same conversion data is returned every time per install */
             @Override
             public void onInstallConversionDataLoaded(Map<String, String> conversionData) {
+//                Log.w(LOG_TAG, "onInstallConversionDataLoaded");
+
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
+                    Log.v(LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
                 }
                 setInstallData(conversionData);
             }
 
             @Override
             public void onInstallConversionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error getting conversion data: " + errorMessage);
+//                Log.w(LOG_TAG, "error getting conversion data: " + errorMessage);
                 conversionError = "error getting conversion data: " + errorMessage;
                 errorCallback(conversionError);
             }
@@ -111,14 +121,15 @@ public class AppsFlyerExtension extends Extension {
             /* Called only when a Deep Link is opened */
             @Override
             public void onAppOpenAttribution(Map<String, String> conversionData) {
+//                Log.w(LOG_TAG, "onAppOpenAttribution");
                 for (String attrName : conversionData.keySet()) {
-                    Log.d(AppsFlyerLib.LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
+                    Log.v(LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
                 }
             }
 
             @Override
             public void onAttributionFailure(String errorMessage) {
-                Log.d(AppsFlyerLib.LOG_TAG, "error onAttributionFailure : " + errorMessage);
+                // Log.w(LOG_TAG, "error onAttributionFailure : " + errorMessage);
             }
         };
 
@@ -129,12 +140,22 @@ public class AppsFlyerExtension extends Extension {
         );
 
         AppsFlyerLib.getInstance().startTracking(Extension.mainActivity.getApplication(), devKey);
+        // AppsFlyerLib.getInstance().startTracking(Extension.mainActivity.getApplication(), devKey, myListener());
+    }
 
+    private AppsFlyerTrackingRequestListener myListener() {
+        return new AppsFlyerTrackingRequestListener() {
+            @Override public void onTrackingRequestSuccess() {
+                Log.w("LOG_TAG", "myListener: Got 200 response from server");
+            }
+            @Override public void onTrackingRequestFailure(String error) {
+                Log.w("LOG_TAG", "myListener error: " + error);
+            }
+        };
     }
 
     public static void trackEvent (String eventName, String eventData) {
-
-        Log.v(AppsFlyerLib.LOG_TAG, "Trying to send. trackEvent: " + eventName + ", data: " + eventData);
+        // Log.w(LOG_TAG, "Trying to send. trackEvent: " + eventName + ", data: " + eventData);
         Map<String, Object> eventValue = new HashMap<String, Object>();
         if (eventData != null) {
             try {
@@ -147,15 +168,17 @@ public class AppsFlyerExtension extends Extension {
                     eventValue.put(key,jObject.get(key));
                 }
                 AppsFlyerLib.getInstance().trackEvent(Extension.mainContext, eventName, eventValue);
-                Log.v(AppsFlyerLib.LOG_TAG, "Success!");
+                // Log.w(LOG_TAG, "Success!");
             } catch (final JSONException e) {
-                Log.e(AppsFlyerLib.LOG_TAG, "Json parsing error: " + e.getMessage());
+                Log.e(LOG_TAG, "Json parsing error: " + e.getMessage());
             }
         }
     }
 
     private static void successCallback(String response)
     {
+        // Log.w(LOG_TAG, "successCallback");
+
         if (AppsFlyerExtension.callbackObj != null)
             AppsFlyerExtension.callbackObj.call1("onSuccess_jni", response);
     }
@@ -171,7 +194,7 @@ public class AppsFlyerExtension extends Extension {
         {
             installConversionData = Joiner.on("&").withKeyValueSeparator("=").join(conversionData);
 
-            Log.v(AppsFlyerLib.LOG_TAG, "ad campaign info: " + installConversionData);
+            // Log.w(LOG_TAG, "ad campaign info: " + installConversionData);
             successCallback(installConversionData);
             sessionCount++;
         }
@@ -200,11 +223,10 @@ public class AppsFlyerExtension extends Extension {
 	 * Called when the activity is starting.
 	 */
 	public void onCreate (Bundle savedInstanceState) {
-		Log.v(AppsFlyerLib.LOG_TAG, "activity onCreate");
-        startTracking(getString(org.haxe.extension.appsflyerextension.R.string.af_dev_key));
+		// Log.w(LOG_TAG, "activity onCreate");
+        // startTracking(getString(org.haxe.extension.appsflyerextension.R.string.af_dev_key));
 	}
-	
-	
+
 	/**
 	 * Perform any final cleanup before an activity is destroyed.
 	 */
