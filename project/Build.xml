@@ -1,5 +1,4 @@
 <xml>
-	
 	<include name="${HXCPP}/build-tool/BuildCommon.xml"/>
 
 	<files id="common">
@@ -12,6 +11,10 @@
         <compilerflag value="-std=c++11" />
 		<file name="src/AppsFlyerAppDelegate.mm"/>
 		<file name="src/AppsFlyerObserver.mm"/>
+	</files>
+	<files id="android">
+		<compilerflag value="-Iinclude"/>
+		<file name="src/AppsFlyerExtension.cpp"/>
 	</files>
 	
 	<set name="SLIBEXT" value=".lib" if="windows"/>
@@ -26,11 +29,12 @@
 		<ext value=".ndll" if="windows || mac || linux"/>
 		<files id="common"/>
 		<files id="iphone" if="iphone"/>
+		<files id="android" if="android"/>
 		
 	</target>
 	
 	<target id="default">
-		<target id="NDLL" if="ios"/>
+		<target id="NDLL"/>
 	</target>
 	
 </xml>
