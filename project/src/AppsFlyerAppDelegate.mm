@@ -4,9 +4,9 @@
 #import <AppsFlyerLib/AppsFlyerTracker.h>
 
 namespace appsflyerextension {
-    
+
 	AppsFlyerObserver *obs;
-	
+
 	void Pre_init() {
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
@@ -23,7 +23,7 @@ namespace appsflyerextension {
             
         });
 	}
-	
+
     void StartTracking(std::string devkey, std::string appId) {
         NSLog(@"appsflyerextension StartTracking");
         NSString* key = [[NSString alloc] initWithUTF8String:devkey.c_str()];
@@ -31,10 +31,26 @@ namespace appsflyerextension {
         
         [AppsFlyerTracker sharedTracker].appleAppID = aId;
         [AppsFlyerTracker sharedTracker].appsFlyerDevKey = key;
-        
+
         [[AppsFlyerTracker sharedTracker] trackAppLaunch];
-        
+
+        // DEBUG MODE
+        /*
+        [AppsFlyerTracker sharedTracker].isDebug = true;
+        [[AppsFlyerTracker sharedTracker] trackAppLaunchWithCompletionHandler:^(NSDictionary<NSString *,id> *dictionary, NSError *error) {
+            if (error) {
+                NSLog(@"%@", error);
+                return;
+            }
+            if (dictionary) {
+                NSLog(@"%@", dictionary);
+                return;
+            }
+            [NSException exceptionWithName:@"fatalError" reason:nil userInfo:nil];
+        }];
+         */
     }
+
     void TrackEvent(std::string eventName, std::string eventData) {
         NSLog(@"appsflyerextension TrackEvent");
         NSString* eName = [[NSString alloc] initWithUTF8String:eventName.c_str()];
@@ -46,6 +62,4 @@ namespace appsflyerextension {
         
         NSLog(@"%@", responseDic);
     }
-    
-    
 }

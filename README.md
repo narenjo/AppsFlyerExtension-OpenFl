@@ -1,3 +1,9 @@
+#FORK CHANGES
+1) Changes for OpenFL next (JNI path)
+2) AppsFlyerSDK was updated to `4.10.0` for both platforms
+3) Android: call `startTracking` manually, remove ndll from `include.xml`
+4) iOS: added 2 required frameworks - `Security.framework` and `CFNetwork.framework`
+
 # AppsFlyerExtension-OpenFl
 Native extension (iOS, Android) AppsFlyer SDK for OpenFl
 
