@@ -4,7 +4,7 @@
 #import <AppsFlyerLib/AppsFlyerTracker.h>
 
 extern "C" void returnConversionSuccess (const char* data);
-extern "C" void returnConversionError (const char* data);
+extern "C" void returnConversionError ();
 
 @interface ConversionListener : NSObject <AppsFlyerTrackerDelegate>
 @end
@@ -18,6 +18,7 @@ extern "C" void returnConversionError (const char* data);
 
 static NSMutableString *resultString;
 static NSString *errorString;
+
 
 /*
 -(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *) launchOptions
@@ -39,37 +40,23 @@ static NSString *errorString;
     } else if([status isEqualToString:@"Organic"]) {
         NSLog(@"This is an organic install.");
     }
-    
-    resultString = [NSMutableString string];
-    for (NSString* key in [installData allKeys]){
-        if ([resultString length]>0)
-            [resultString appendString:@"&"];
-        [resultString appendFormat:@"%@=%@", key, [installData objectForKey:key]];
-    }
-    
-    if ([NSThread isMainThread]){
-        returnConversionSuccess([resultString UTF8String]);
-    }else{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            returnConversionSuccess([resultString UTF8String]);
-        });
-    }
-    
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSMutableString* referrerUri = [[NSMutableString alloc] init];
+        for (NSString* key in [installData allKeys]) {
+            if ([referrerUri length]>0)
+                [referrerUri appendString:@"&"];
+            [referrerUri appendFormat:@"%@=%@", key, [installData objectForKey:key]];
+        }
+        returnConversionSuccess([referrerUri UTF8String]);
+    });
 }
 
 -(void)onConversionDataRequestFailure:(NSError *) error {
-    NSLog(@"%@", error);
-    errorString = [NSString stringWithFormat:@"%@", error];
-    
-    if ([NSThread isMainThread]){
-        returnConversionError([errorString UTF8String]);
-    }else{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            returnConversionError([errorString UTF8String]);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        returnConversionError();
+    });
 }
-
 
 @end
 
@@ -77,20 +64,17 @@ namespace appsflyerextension {
 
     void Init()
     {
+        [AppsFlyerTracker sharedTracker].appleAppID = [[NSBundle mainBundle].infoDictionary objectForKey:@"AppsFlyerAppId"];
+        [AppsFlyerTracker sharedTracker].appsFlyerDevKey = [[NSBundle mainBundle].infoDictionary objectForKey:@"AppsFlyerDevKey"];
+        NSLog(@"appsflyerextension Init appId:%@, appKey:%@", [AppsFlyerTracker sharedTracker].appleAppID, [AppsFlyerTracker sharedTracker].appsFlyerDevKey);
+
         ConversionListener *listener = [[ConversionListener alloc] init];
-        NSLog(@"appsflyerextension Init");
         [AppsFlyerTracker sharedTracker].delegate = listener;
         NSLog(@"appsflyerextension Init");
     }
 
     void StartTracking(std::string devkey, std::string appId) {
         NSLog(@"appsflyerextension StartTracking1");
-        NSString* key = [[NSString alloc] initWithUTF8String:devkey.c_str()];
-        NSString* aId = [[NSString alloc] initWithUTF8String:appId.c_str()];
-        
-        [AppsFlyerTracker sharedTracker].appleAppID = aId;
-        [AppsFlyerTracker sharedTracker].appsFlyerDevKey = key;
-
         [[AppsFlyerTracker sharedTracker] trackAppLaunch];
 
         /*WithCompletionHandler:^(NSDictionary<NSString *,id> *dictionary, NSError *error) {
