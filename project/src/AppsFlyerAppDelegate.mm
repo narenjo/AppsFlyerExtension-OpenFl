@@ -1,5 +1,4 @@
 #include "AppsFlyerAppInterface.h"
-#include "AppsFlyerObserver.h"
 #import <UIKit/UIKit.h>
 #import <AppsFlyerLib/AppsFlyerTracker.h>
 
