@@ -89,7 +89,7 @@ public class AppsFlyerExtension extends Extension {
             errorCallback(AppsFlyerExtension.conversionError);
     }
 
-    private void startTracking (String devKey) {
+    static public void startTracking (String devKey) {
         AppsFlyerExtension.devKey = devKey;
 
         Log.v(LOG_TAG, "startTracking with id: " + devKey);
@@ -125,28 +125,31 @@ public class AppsFlyerExtension extends Extension {
             }
         };
 
-	final AppsFlyerTrackingRequestListener requestListener = new AppsFlyerTrackingRequestListener() {
-                @Override
-                public void onTrackingRequestSuccess() {
-                    Log.d(LOG_TAG,"Request to server successfully sent");
-                }
+	    final AppsFlyerTrackingRequestListener requestListener = new AppsFlyerTrackingRequestListener() {
+            @Override
+            public void onTrackingRequestSuccess() {
+                Log.d(LOG_TAG,"Request to server successfully sent");
+            }
 
-                @Override
-                public void onTrackingRequestFailure(String s) {
-                    Log.d(LOG_TAG,"Error sending request to server: "+s);
-		    conversionError = "Error sending request to server: "+s;
-		    errorCallback(conversionError);
-                }
-            };
+            @Override
+            public void onTrackingRequestFailure(String s) {
+                Log.d(LOG_TAG,"Error sending request to server: "+s);
+                conversionError = "Error sending request to server: "+s;
+                errorCallback(conversionError);
+            }
+        };
 
         AppsFlyerLib.getInstance().init(
-                devKey,
-                convListener,
-                Extension.mainContext
+            devKey,
+            convListener,
+            Extension.mainContext
         );
 
-        AppsFlyerLib.getInstance().startTracking(Extension.mainActivity.getApplication(), devKey, requestListener);
-
+        AppsFlyerLib.getInstance().startTracking(
+            Extension.mainActivity.getApplication(),
+            devKey,
+            requestListener
+        );
     }
 
     public static void trackEvent (String eventName, String eventData) {
@@ -217,8 +220,6 @@ public class AppsFlyerExtension extends Extension {
 	 * Called when the activity is starting.
 	 */
 	public void onCreate (Bundle savedInstanceState) {
-		Log.v(LOG_TAG, "activity onCreate");
-        startTracking(getString(org.haxe.extension.appsflyerextension.R.string.af_dev_key));
 	}
 	
 	

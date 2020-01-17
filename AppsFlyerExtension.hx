@@ -42,12 +42,12 @@ class AppsFlyerExtension {
 	
 	public static function startTracking (devKey:String, appId:String = ""):Void {
 		#if (android)
-//		var fn = JNI.createStaticMethod(
-//			"org.haxe.extension.AppsFlyerExtension",
-//			"init",
-//			"(Ljava/lang/String;)V"
-//		);
-//		JNI.callStatic(fn, [devKey]);
+		var appsflyerextension_start:Dynamic = JNI.createStaticMethod(
+			"org.haxe.extension.AppsFlyerExtension",
+			"startTracking",
+			"(Ljava/lang/String;)V"
+		);
+		appsflyerextension_start(devKey);
 		#end
 
 		#if (ios)

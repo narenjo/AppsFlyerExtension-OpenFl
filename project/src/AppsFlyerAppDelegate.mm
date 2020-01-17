@@ -63,17 +63,20 @@ namespace appsflyerextension {
 
     void Init()
     {
-        [AppsFlyerTracker sharedTracker].appleAppID = [[NSBundle mainBundle].infoDictionary objectForKey:@"AppsFlyerAppId"];
-        [AppsFlyerTracker sharedTracker].appsFlyerDevKey = [[NSBundle mainBundle].infoDictionary objectForKey:@"AppsFlyerDevKey"];
-        NSLog(@"appsflyerextension Init appId:%@, appKey:%@", [AppsFlyerTracker sharedTracker].appleAppID, [AppsFlyerTracker sharedTracker].appsFlyerDevKey);
-
-        ConversionListener *listener = [[ConversionListener alloc] init];
-        [AppsFlyerTracker sharedTracker].delegate = listener;
         NSLog(@"appsflyerextension Init");
     }
 
     void StartTracking(std::string devkey, std::string appId) {
-        NSLog(@"appsflyerextension StartTracking1");
+        NSString *devKeyNS = [[NSString alloc] initWithUTF8String:devkey.c_str()];
+        NSString *appIdNS = [[NSString alloc] initWithUTF8String:appId.c_str()];
+
+        [AppsFlyerTracker sharedTracker].appleAppID = appIdNS;
+        [AppsFlyerTracker sharedTracker].appsFlyerDevKey = devKeyNS;
+        NSLog(@"appsflyerextension Init appId:%@, appKey:%@", [AppsFlyerTracker sharedTracker].appleAppID, [AppsFlyerTracker sharedTracker].appsFlyerDevKey);
+
+        ConversionListener *listener = [[ConversionListener alloc] init];
+        [AppsFlyerTracker sharedTracker].delegate = listener;
+
         [[AppsFlyerTracker sharedTracker] trackAppLaunch];
 
         /*WithCompletionHandler:^(NSDictionary<NSString *,id> *dictionary, NSError *error) {

@@ -64,7 +64,6 @@ DEFINE_ENTRY_POINT (appsflyerextension_main);
 
 
 extern "C" int appsflyerextension_register_prims () {
-    Init();
     return 0;
 }
 
