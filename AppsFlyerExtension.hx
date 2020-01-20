@@ -14,7 +14,7 @@ import lime.system.JNI;
 class AppsFlyerExtension {
 
 	#if (ios)
-		private static var appsflyerextension_startTracking = Lib.load ("appsflyerextension", "appsflyerextension_startTracking", 2);
+		private static var appsflyerextension_trackAppLaunch = Lib.load ("appsflyerextension", "appsflyerextension_trackAppLaunch", 0);
 		private static var appsflyerextension_trackEvent = Lib.load ("appsflyerextension", "appsflyerextension_trackEvent", 2);
 		private static var appsflyerextension_addConversionListenerCallback = Lib.load ("appsflyerextension", "appsflyerextension_addConversionListenerCallback", 2);
 	#end
@@ -42,27 +42,38 @@ class AppsFlyerExtension {
 	
 	public static function startTracking (devKey:String, appId:String = ""):Void {
 		#if (android)
-		var appsflyerextension_start:Dynamic = JNI.createStaticMethod(
+		var appsflyerextension_startTracking:Dynamic = JNI.createStaticMethod(
 			"org.haxe.extension.AppsFlyerExtension",
 			"startTracking",
 			"(Ljava/lang/String;)V"
 		);
-		appsflyerextension_start(devKey);
+		appsflyerextension_startTracking(devKey);
 		#end
 
 		#if (ios)
-			appsflyerextension_startTracking(devKey, appId);
+		var appsflyerextension_startTracking:Dynamic = Lib.load ("appsflyerextension", "appsflyerextension_startTracking", 2);
+		appsflyerextension_startTracking(devKey, appId);
+		#end
+	}
+
+	public static function trackAppLaunch():Void {
+		#if (ios)
+			appsflyerextension_trackAppLaunch();
 		#end
 	}
 
 	public static function trackEvent (eventName:String, eventData:String):Void {
 		#if (android)
+
 			appsflyerextension_trackEvent_jni(eventName, eventData);
+
+		#end
+		#if (ios)
+
+			appsflyerextension_trackEvent(eventName, eventData);
+
 		#end
 
-		#if (ios)
-			appsflyerextension_trackEvent(eventName, eventData);
-		#end
 	}
 
 	public static function addConversionListenerCallback(onSuccess:String -> Void, onError:Void -> Void):Void {

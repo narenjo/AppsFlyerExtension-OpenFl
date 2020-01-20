@@ -31,6 +31,13 @@ static void appsflyerextension_startTracking (value devkey, value appId) {
 }
 DEFINE_PRIM (appsflyerextension_startTracking, 2);
 
+static void appsflyerextension_trackAppLaunch () {
+
+	TrackAppLaunch();
+
+}
+DEFINE_PRIM (appsflyerextension_trackAppLaunch, 0);
+
 static void appsflyerextension_trackEvent (value eventName, value eventData) {
 
 	TrackEvent(val_get_string(eventName), val_get_string(eventData));
