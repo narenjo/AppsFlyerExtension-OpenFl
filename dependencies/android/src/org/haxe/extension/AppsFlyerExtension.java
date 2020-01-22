@@ -89,7 +89,7 @@ public class AppsFlyerExtension extends Extension {
 			errorCallback(AppsFlyerExtension.conversionError);
 	}
 
-	static public void startTracking (String devKey) {
+	static void startTracking (String devKey) {
 		AppsFlyerExtension.devKey = devKey;
 
 		Log.v(LOG_TAG, "startTracking with id: " + devKey);
@@ -98,6 +98,7 @@ public class AppsFlyerExtension extends Extension {
 			/* Returns the attribution data. Note - the same conversion data is returned every time per install */
 			@Override
 			public void onConversionDataSuccess(Map<String,Object> conversionData) {
+				Log.d(LOG_TAG, "Success onConversionDataSuccess");
 				for (String attrName : conversionData.keySet()) {
 					Log.d(LOG_TAG, "attribute: " + attrName + " = " + conversionData.get(attrName));
 				}
@@ -106,7 +107,7 @@ public class AppsFlyerExtension extends Extension {
 
 			@Override
 			public void onConversionDataFail(String errorMessage) {
-				Log.d(LOG_TAG, "error onConversionDataFail : " + errorMessage);
+				Log.d(LOG_TAG, "Error onConversionDataFail: " + errorMessage);
 				conversionError = "error getting conversion data: " + errorMessage;
 				errorCallback(conversionError);
 			}
@@ -217,6 +218,7 @@ public class AppsFlyerExtension extends Extension {
 	 * Called when the activity is starting.
 	 */
 	public void onCreate (Bundle savedInstanceState) {
+		startTracking(getString(org.haxe.extension.appsflyerextension.R.string.af_dev_key));
 	}
 	
 	

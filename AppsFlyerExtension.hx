@@ -41,15 +41,6 @@ class AppsFlyerExtension {
 	}
 	
 	public static function startTracking (devKey:String, appId:String = ""):Void {
-		#if (android)
-		var appsflyerextension_startTracking:Dynamic = JNI.createStaticMethod(
-			"org.haxe.extension.AppsFlyerExtension",
-			"startTracking",
-			"(Ljava/lang/String;)V"
-		);
-		appsflyerextension_startTracking(devKey);
-		#end
-
 		#if (ios)
 		var appsflyerextension_startTracking:Dynamic = Lib.load ("appsflyerextension", "appsflyerextension_startTracking", 2);
 		appsflyerextension_startTracking(devKey, appId);
