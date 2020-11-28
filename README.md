@@ -7,19 +7,25 @@
 # AppsFlyerExtension-OpenFl
 Native extension (iOS, Android) AppsFlyer SDK for OpenFl
 
-**Install:**
+###Install:
 1. run `haxelib git AppsFlyerExtension https://github.com/GreenishFlow/AppsFlyerExtension-HAXE`
 2. add to project.xml:
 
 	`<haxelib name="AppsFlyerExtension" />`
 	
 	
-**Initialization:**
+###Initialization:  
+
+**Android**:  
+For an android app you must include your APPS_FLYER_DEV_KEY in project.xml:  
+`<setenv name="APPS_FLYER_DEV_KEY" value="{YOUR_KEY}" />`
+
+**iOS**:  
 
 `AppsFlyerExtension.startTracking(devKey:String, appId:String = "");`
 (appId is using for for iOS https://support.appsflyer.com/hc/en-us/articles/207032066-AppsFlyer-SDK-Integration-iOS)
 
-**Send event:**
+###Send event:
 
 `AppsFlyerExtension.trackEvent(eventName:String, eventData:String);`
 
