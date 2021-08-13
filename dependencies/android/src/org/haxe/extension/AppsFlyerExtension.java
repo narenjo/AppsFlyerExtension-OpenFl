@@ -12,7 +12,8 @@ import android.util.Log;
 import com.google.common.base.Joiner;
 import com.appsflyer.AppsFlyerLib;
 import com.appsflyer.AppsFlyerConversionListener;
-import com.appsflyer.AppsFlyerTrackingRequestListener;
+import com.appsflyer.attribution.AppsFlyerRequestListener;
+
 import android.app.Application;
 import java.util.*;
 import java.lang.Runnable;
@@ -126,16 +127,16 @@ public class AppsFlyerExtension extends Extension {
 			}
 		};
 
-		final AppsFlyerTrackingRequestListener requestListener = new AppsFlyerTrackingRequestListener() {
+		final AppsFlyerRequestListener requestListener = new AppsFlyerRequestListener() {
 			@Override
-			public void onTrackingRequestSuccess() {
+			public void onSuccess() {
 				Log.d(LOG_TAG,"Request to server successfully sent");
 			}
 
 			@Override
-			public void onTrackingRequestFailure(String s) {
-				Log.d(LOG_TAG,"Error sending request to server: "+s);
-				conversionError = "Error sending request to server: "+s;
+			public void onError(int code, String error) {
+				Log.d(LOG_TAG,"Error sending request to server: "+error);
+				conversionError = "Error sending request to server: "+error;
 				errorCallback(conversionError);
 			}
 		};
@@ -146,7 +147,7 @@ public class AppsFlyerExtension extends Extension {
 			Extension.mainContext
 		);
 
-		AppsFlyerLib.getInstance().startTracking(Extension.mainActivity.getApplication());
+		AppsFlyerLib.getInstance().start(Extension.mainActivity.getApplication(), devKey, requestListener);
 
 	}
 
@@ -164,7 +165,7 @@ public class AppsFlyerExtension extends Extension {
 					String key = (String) keys.next();
 					eventValue.put(key,jObject.get(key));
 				}
-				AppsFlyerLib.getInstance().trackEvent(Extension.mainContext, eventName, eventValue);
+				AppsFlyerLib.getInstance().logEvent(Extension.mainContext, eventName, eventValue);
 				Log.v(LOG_TAG, "Success!");
 			} catch (final JSONException e) {
 				Log.e(LOG_TAG, "Json parsing error: " + e.getMessage());
